@@ -1,0 +1,261 @@
+/* ─────────────────────────────────────────────
+   App.css — Dark premium styles for myshic.com
+   Brand accent: dark crimson red #c0182e
+   ───────────────────────────────────────────── */
+
+/* ── CSS variables (brand palette) ─────────────
+   Change --accent to update the whole site.     */
+:root {
+  --accent:        #c0182e;   /* dark crimson red   */
+  --accent-hover:  #a01226;   /* deeper on hover    */
+  --accent-glow:   rgba(192, 24, 46, 0.45);
+  --accent-soft:   rgba(192, 24, 46, 0.12);
+  --accent-border: rgba(192, 24, 46, 0.35);
+  --accent-text:   #f87171;   /* light red for badge text */
+}
+
+/* ── Root / page shell ──────────────────────── */
+.page-root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: #060c18;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ── Subtle dot-grid background ─────────────── */
+.grid-bg {
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle, rgba(255,255,255,0.05) 1px, transparent 1px);
+  background-size: 32px 32px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── Radial red glow behind hero ─────────────── */
+.hero-glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -58%);
+  width: 720px;
+  height: 520px;
+  background: radial-gradient(
+    ellipse at center,
+    var(--accent-glow) 0%,
+    rgba(192, 24, 46, 0.10) 45%,
+    transparent 70%
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── Navbar ──────────────────────────────────── */
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  padding: 16px 28px;
+  display: flex;
+  align-items: center;
+  /* subtle frosted border at bottom */
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  background: rgba(6, 12, 24, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.nav-logo-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+
+/* Logo image — rounded corners */
+.nav-logo {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  object-fit: cover;
+  /* subtle red ring to tie into brand */
+  box-shadow: 0 0 0 1.5px rgba(192, 24, 46, 0.4);
+}
+
+.nav-brand {
+  font-size: 15px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.9);
+  letter-spacing: -0.01em;
+}
+
+/* ── Hero content wrapper ────────────────────── */
+.hero-container {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 28px;
+  padding: 0 24px;
+  max-width: 640px;
+  width: 100%;
+  /* push down so navbar doesn't overlap */
+  margin-top: 70px;
+}
+
+/* ── Top "myshic.com" badge ──────────────────── */
+.top-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--accent-border);
+  background: var(--accent-soft);
+  color: var(--accent-text);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* Pulsing dot */
+.badge-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 8px var(--accent-glow);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1;   transform: scale(1);    }
+  50%       { opacity: 0.5; transform: scale(0.85); }
+}
+
+/* ── Big name heading ────────────────────────── */
+.hero-name {
+  font-size: clamp(72px, 14vw, 128px);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  color: #ffffff;
+  margin: 0;
+  /* white → light-red shimmer */
+  background: linear-gradient(
+    135deg,
+    #ffffff 0%,
+    #fca5a5 50%,
+    #ffffff 100%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Sub-label ───────────────────────────────── */
+.hero-sub {
+  font-size: 16px;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.45);
+  margin: 0;
+  letter-spacing: 0.01em;
+}
+
+/* ── Social link button row ──────────────────── */
+.link-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+/* ── Button base ─────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 22px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 120ms ease, box-shadow 120ms ease,
+              background 120ms ease, border-color 120ms ease;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+}
+
+/* ── Primary (YouTube) — crimson red ─────────── */
+.btn-primary {
+  background: var(--accent);
+  color: #ffffff;
+  border-color: var(--accent);
+  box-shadow: 0 0 22px var(--accent-glow);
+}
+
+.btn-primary:hover {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+  box-shadow: 0 0 36px var(--accent-glow);
+}
+
+/* ── Ghost (Discord, GitHub) ─────────────────── */
+.btn-ghost {
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.8);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.btn-ghost:hover {
+  background: rgba(255, 255, 255, 0.10);
+  border-color: rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+}
+
+/* ── Footer ──────────────────────────────────── */
+.site-footer {
+  position: absolute;
+  bottom: 24px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.2);
+  letter-spacing: 0.02em;
+  z-index: 1;
+}
+
+/* ── Mobile ──────────────────────────────────── */
+@media (max-width: 480px) {
+  .hero-container { gap: 20px; }
+
+  .link-row {
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+  }
+
+  .btn {
+    width: 100%;
+    max-width: 280px;
+    justify-content: center;
+  }
+}
