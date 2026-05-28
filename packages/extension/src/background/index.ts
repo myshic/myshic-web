@@ -189,26 +189,40 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   return false
 })
 
+/** Synchronize Chrome's active rulesets with stored stats configuration */
+async function syncRulesets(stats: Stats): Promise<void> {
+  const enableRulesetIds: string[] = []
+  const disableRulesetIds: string[] = []
+
+  if (stats.enabled) {
+    enableRulesetIds.push('ads', 'trackers')
+    if (stats.lowDataMode) {
+      enableRulesetIds.push('low_data')
+    } else {
+      disableRulesetIds.push('low_data')
+    }
+  } else {
+    disableRulesetIds.push('ads', 'trackers', 'low_data')
+  }
+
+  await chrome.declarativeNetRequest.updateEnabledRulesets({
+    enableRulesetIds,
+    disableRulesetIds,
+  })
+}
+
 /** Toggle master on/off — enable or disable all rulesets */
 async function handleToggleEnabled(): Promise<boolean> {
   const stats = await ensureStats()
   const newEnabled = !stats.enabled
 
-  if (newEnabled) {
-    // Re-enable ad + tracker rulesets
-    await chrome.declarativeNetRequest.updateEnabledRulesets({
-      enableRulesetIds: ['ads', 'trackers'],
-    })
-  } else {
-    // Disable all rulesets
-    await chrome.declarativeNetRequest.updateEnabledRulesets({
-      disableRulesetIds: ['ads', 'trackers', 'low_data'],
-    })
-  }
-
   stats.enabled = newEnabled
   // If disabling master, also turn off low data mode
-  if (!newEnabled) stats.lowDataMode = false
+  if (!newEnabled) {
+    stats.lowDataMode = false
+  }
+  
+  await syncRulesets(stats)
   await chrome.storage.local.set({ stats })
   return newEnabled
 }
@@ -218,26 +232,21 @@ async function handleToggleLowData(): Promise<boolean> {
   const stats = await ensureStats()
   const newLowData = !stats.lowDataMode
 
-  if (newLowData) {
-    await chrome.declarativeNetRequest.updateEnabledRulesets({
-      enableRulesetIds: ['low_data'],
-    })
-  } else {
-    await chrome.declarativeNetRequest.updateEnabledRulesets({
-      disableRulesetIds: ['low_data'],
-    })
-  }
-
   stats.lowDataMode = newLowData
+  await syncRulesets(stats)
   await chrome.storage.local.set({ stats })
   return newLowData
 }
 
 /* ── On install / update — initialise stats ──── */
 chrome.runtime.onInstalled.addListener(async () => {
-  await ensureStats()
+  const stats = await ensureStats()
   await maybeResetCounters()
+  await syncRulesets(stats)
 })
 
 // Also run on service worker startup
-ensureStats().then(() => maybeResetCounters())
+ensureStats().then(async (stats) => {
+  await maybeResetCounters()
+  await syncRulesets(stats)
+})
