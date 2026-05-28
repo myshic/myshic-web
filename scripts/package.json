@@ -1,0 +1,14 @@
+{
+  "name": "scripts",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "convert-rules": "tsx convert-rules.ts",
+    "generate-icons": "tsx generate-icons.ts"
+  },
+  "devDependencies": {
+    "sharp": "^0.33.5",
+    "tsx": "^4.19.0"
+  }
+}
