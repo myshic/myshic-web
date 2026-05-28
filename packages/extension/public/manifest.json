@@ -3,7 +3,7 @@
   "name": "Netlight",
   "version": "0.1.0",
   "description": "Save data. Block noise. Browse lighter.",
-  "permissions": ["storage", "tabs", "declarativeNetRequest", "webNavigation"],
+  "permissions": ["storage", "tabs", "declarativeNetRequest", "declarativeNetRequestFeedback", "webNavigation"],
   "background": {
     "service_worker": "background.js"
   },

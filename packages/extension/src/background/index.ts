@@ -112,39 +112,47 @@ async function maybeResetCounters(): Promise<void> {
 // unpacked in developer mode. In production we fall back to
 // counting via webNavigation + periodic checks.
 // For Phase 1 MVP, onRuleMatchedDebug is the primary mechanism.
+let statsQueue = Promise.resolve()
+
 if (chrome.declarativeNetRequest.onRuleMatchedDebug) {
-  chrome.declarativeNetRequest.onRuleMatchedDebug.addListener(async (info) => {
-    const stats = await ensureStats()
-    await maybeResetCounters()
+  chrome.declarativeNetRequest.onRuleMatchedDebug.addListener((info) => {
+    statsQueue = statsQueue.then(async () => {
+      try {
+        await maybeResetCounters()
+        const stats = await ensureStats()
 
-    // Determine resource type
-    const resourceType = info.request.type || 'other'
-    const estimatedBytes = AVG_SIZES[resourceType] ?? AVG_SIZES.other
+        // Determine resource type
+        const resourceType = info.request.type || 'other'
+        const estimatedBytes = AVG_SIZES[resourceType] ?? AVG_SIZES.other
 
-    // Extract domain from the request URL
-    let domain = 'unknown'
-    try {
-      domain = new URL(info.request.url).hostname
-    } catch {
-      // URL parsing failed, keep "unknown"
-    }
+        // Extract domain from the request URL
+        let domain = 'unknown'
+        try {
+          domain = new URL(info.request.url).hostname
+        } catch {
+          // URL parsing failed, keep "unknown"
+        }
 
-    // Update all stat buckets
-    stats.today.blocked += 1
-    stats.today.bytesSaved += estimatedBytes
-    stats.weekly.blocked += 1
-    stats.weekly.bytesSaved += estimatedBytes
-    stats.lifetime.blocked += 1
-    stats.lifetime.bytesSaved += estimatedBytes
+        // Update all stat buckets
+        stats.today.blocked += 1
+        stats.today.bytesSaved += estimatedBytes
+        stats.weekly.blocked += 1
+        stats.weekly.bytesSaved += estimatedBytes
+        stats.lifetime.blocked += 1
+        stats.lifetime.bytesSaved += estimatedBytes
 
-    // Per-domain stats
-    if (!stats.byDomain[domain]) {
-      stats.byDomain[domain] = { blocked: 0, bytesSaved: 0 }
-    }
-    stats.byDomain[domain].blocked += 1
-    stats.byDomain[domain].bytesSaved += estimatedBytes
+        // Per-domain stats
+        if (!stats.byDomain[domain]) {
+          stats.byDomain[domain] = { blocked: 0, bytesSaved: 0 }
+        }
+        stats.byDomain[domain].blocked += 1
+        stats.byDomain[domain].bytesSaved += estimatedBytes
 
-    await chrome.storage.local.set({ stats })
+        await chrome.storage.local.set({ stats })
+      } catch (error) {
+        console.error('Error updating stats in onRuleMatchedDebug:', error)
+      }
+    })
   })
 }
 
