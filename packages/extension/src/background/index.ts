@@ -121,8 +121,9 @@ if (chrome.declarativeNetRequest.onRuleMatchedDebug) {
         await maybeResetCounters()
         const stats = await ensureStats()
 
-        // Determine resource type
-        const resourceType = info.request.type || 'other'
+        // Determine resource type (check both type and resourceType to be safe)
+        const rawType = info.request.type || (info.request as any).resourceType || 'other'
+        const resourceType = rawType.toLowerCase()
         const estimatedBytes = AVG_SIZES[resourceType] ?? AVG_SIZES.other
 
         // Extract domain from the request URL
